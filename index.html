@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Beach Defence</title>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="hud" class="hidden">
+      <div id="hud-top-left">
+        <div class="label">SCORE</div>
+        <div id="score">0</div>
+        <div class="label">WAVE <span id="wave">1</span></div>
+      </div>
+      <div id="hud-top-right">
+        <div class="label">DEFENCE LINE</div>
+        <div id="lives"></div>
+      </div>
+      <div id="crosshair"></div>
+      <div id="banner"></div>
+      <div id="heat-wrap">
+        <div class="label">BARREL HEAT</div>
+        <div id="heat-bar"><div id="heat-fill"></div></div>
+        <div id="heat-warn">OVERHEATED</div>
+      </div>
+    </div>
+
+    <div id="damage"></div>
+    <div id="overlay"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
