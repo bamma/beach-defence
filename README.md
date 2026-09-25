@@ -5,11 +5,25 @@ dune-top bunker while enemy soldiers storm the beach in rubber landing boats.
 
 ## Play
 
+**Online:** https://bamma.github.io/beach-defence/
+
+Locally:
+
 ```bash
 npm install
 npm run dev      # then open the printed URL
 npm run build    # static build in dist/ (relative paths, works on GitHub Pages)
 ```
+
+## Deploying
+
+Every push to `main` builds the game and publishes it to GitHub Pages
+(`.github/workflows/deploy.yml`). One-time setup: in the repo, go to **Settings → Pages → Build and deployment** and set
+**Source** to **GitHub Actions**.
+
+The `dist/` folder must be served over HTTP (GitHub Pages, `npm run preview`,
+`python3 -m http.server`, and so on). Opening `dist/index.html` directly from disk
+doesn't work, because browsers block module scripts loaded from `file://`.
 
 ## Controls
 
