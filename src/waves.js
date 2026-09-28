@@ -33,6 +33,8 @@ export class WaveDirector {
     this.game.hud.setWave(this.wave);
     this.game.hud.banner(`WAVE ${this.wave}`);
     this.game.audio.horn();
+    const { briefing } = this.game;
+    briefing.show(briefing.demoLine(this.wave));
   }
 
   spawnBoat() {
@@ -54,6 +56,7 @@ export class WaveDirector {
       return;
     }
     if (this.toSpawn > 0) {
+      if (this.game.briefing.active) return; // boats launch once HQ has spoken
       this.spawnT -= dt;
       if (this.spawnT <= 0) {
         this.spawnBoat();

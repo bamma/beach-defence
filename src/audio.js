@@ -123,6 +123,14 @@ export class GameAudio {
     setTimeout(() => this.tone('square', 390, 380, 0.25, 0.12), 180);
   }
 
+  // 8-bit "voice" blip for the briefing typewriter; pitch wobbles per letter.
+  blip(ch = 'a') {
+    if (!this.ctx) return;
+    const vowel = /[aeiou]/i.test(ch);
+    const f = (vowel ? 330 : 260) * (0.94 + Math.random() * 0.12);
+    this.tone('square', f, f * 0.9, 0.05, 0.05, 0.002);
+  }
+
   horn() {
     if (!this.ctx) return;
     const ctx = this.ctx;

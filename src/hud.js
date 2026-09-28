@@ -71,7 +71,7 @@ export class Hud {
     this.showScreen(`
       <h1>BEACH DEFENCE</h1>
       <p>Enemy landing craft are heading for the beach. Man the machine gun and hold the line.</p>
-      <p class="controls"><b>Mouse</b> aim &nbsp;·&nbsp; <b>Left click / Space</b> fire &nbsp;·&nbsp; <b>Esc</b> pause<br/>
+      <p class="controls"><b>Mouse</b> aim &nbsp;·&nbsp; <b>Left click / Space</b> fire &nbsp;·&nbsp; <b>Enter</b> skip radio &nbsp;·&nbsp; <b>Esc</b> pause<br/>
       Keep bursts short: an overheated barrel locks up. Sink boats before they land.</p>
       ${best ? `<p class="controls">Best score: ${best.toLocaleString()}</p>` : ''}
       <div class="cta">CLICK TO MAN THE GUN</div>`);
