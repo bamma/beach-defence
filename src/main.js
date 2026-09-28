@@ -7,6 +7,7 @@ import { Effects } from './effects.js';
 import { WaveDirector } from './waves.js';
 import { Hud } from './hud.js';
 import { GameAudio } from './audio.js';
+import { Briefing } from './briefing.js';
 
 const DEBUG = new URLSearchParams(location.search).has('debug');
 const MAX_LIVES = 10;
@@ -33,6 +34,7 @@ const hud = new Hud();
 const audio = new GameAudio();
 const input = new Input(renderer.domElement);
 const effects = new Effects(scene);
+const briefing = new Briefing(audio);
 
 const game = {
   scene,
@@ -42,6 +44,7 @@ const game = {
   audio,
   input,
   effects,
+  briefing,
   boats: [],
   soldiers: [],
   score: 0,
@@ -157,6 +160,7 @@ function clearEntities() {
   game.boats.length = 0;
   game.soldiers.length = 0;
   effects.clear();
+  briefing.hide();
 }
 
 function startGame() {
@@ -212,6 +216,9 @@ input.onLockError = () => {
   // Re-locking too soon after Esc is refused by browsers: stay paused and let the player click again.
   if (input.everLocked && game.state === 'playing') pause();
 };
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Enter' && game.state === 'playing') briefing.skip();
+});
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) pause();
 });
@@ -219,6 +226,7 @@ document.addEventListener('visibilitychange', () => {
 // --- Main loop ------------------------------------------------------------
 function update(dt) {
   game.time += dt;
+  briefing.update(dt);
   game.director.update(dt);
   for (const b of game.boats) b.update(dt);
   game.boats = game.boats.filter((b) => !b.removed);
