@@ -100,15 +100,42 @@ function createGround() {
   return mesh;
 }
 
-function createHedgehog(mat, beamGeo) {
+const BUS_GEO = {
+  body: new THREE.BoxGeometry(2.5, 2.6, 11),
+  roof: new THREE.BoxGeometry(2.3, 0.25, 10.6),
+  windows: new THREE.BoxGeometry(2.56, 0.9, 9.4),
+  windscreen: new THREE.BoxGeometry(2.2, 1.2, 0.08),
+  stripe: new THREE.BoxGeometry(2.54, 0.18, 10.9),
+  wheel: new THREE.CylinderGeometry(0.5, 0.5, 0.35, 12),
+};
+const BUS_MAT = {
+  glass: new THREE.MeshStandardMaterial({ color: 0x1d2a33, roughness: 0.2, metalness: 0.4 }),
+  roof: new THREE.MeshStandardMaterial({ color: 0xe8e6de, roughness: 0.8 }),
+  stripe: new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.8 }),
+  tyre: new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 1 }),
+};
+
+// A parked coach; origin at ground level, length along local z.
+function createBus(color) {
   const g = new THREE.Group();
-  for (let k = 0; k < 3; k++) {
-    const beam = new THREE.Mesh(beamGeo, mat);
-    beam.rotation.order = 'YXZ';
-    beam.rotation.y = (k * Math.PI * 2) / 3;
-    beam.rotation.x = 0.95;
-    beam.castShadow = true;
-    g.add(beam);
+  const paint = new THREE.MeshStandardMaterial({ color, roughness: 0.6 });
+  const add = (geo, mat, x, y, z) => {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    m.castShadow = true;
+    m.receiveShadow = true;
+    g.add(m);
+    return m;
+  };
+  add(BUS_GEO.body, paint, 0, 1.85, 0);
+  add(BUS_GEO.roof, BUS_MAT.roof, 0, 3.27, 0);
+  add(BUS_GEO.windows, BUS_MAT.glass, 0, 2.35, 0.4);
+  add(BUS_GEO.windscreen, BUS_MAT.glass, 0, 2.25, -5.52);
+  add(BUS_GEO.stripe, BUS_MAT.stripe, 0, 1.2, 0);
+  for (const z of [-3.6, 3.4]) {
+    for (const x of [-1.2, 1.2]) {
+      add(BUS_GEO.wheel, BUS_MAT.tyre, x, 0.5, z).rotation.z = Math.PI / 2;
+    }
   }
   return g;
 }
@@ -221,19 +248,22 @@ export function createWorld(scene) {
   const ground = createGround();
   scene.add(ground);
 
-  // Beach obstacles (block bullets)
+  // Buses parked on the dune top, far to each side so they only show at full traverse.
+  // They block bullets.
   const obstacles = [];
-  const steel = new THREE.MeshStandardMaterial({ color: 0x3a3632, roughness: 0.7, metalness: 0.5 });
-  const beamGeo = new THREE.BoxGeometry(0.22, 2.6, 0.22);
-  for (let i = 0; i < 22; i++) {
-    const x = (Math.random() - 0.5) * 150;
-    const z = WATERLINE_Z + 2 + Math.random() * 28;
-    const h = createHedgehog(steel, beamGeo);
-    h.position.set(x, groundHeight(x, z) + 0.75, z);
-    h.rotation.y = Math.random() * Math.PI;
-    scene.add(h);
-    h.updateMatrixWorld(true);
-    obstacles.push(...h.children);
+  const BUSES = [
+    { x: -44, z: 22, rot: 0.25, color: 0xe8b21c },
+    { x: -58, z: 25, rot: -0.35, color: 0xb8322a },
+    { x: 46, z: 23, rot: -0.2, color: 0x2f6fb0 },
+    { x: 61, z: 21, rot: 0.4, color: 0xe8b21c },
+  ];
+  for (const { x, z, rot, color } of BUSES) {
+    const bus = createBus(color);
+    bus.position.set(x, groundHeight(x, z) - 0.1, z);
+    bus.rotation.y = rot;
+    scene.add(bus);
+    bus.updateMatrixWorld(true);
+    obstacles.push(...bus.children);
   }
   for (const m of obstacles) m.userData.kind = 'obstacle';
 

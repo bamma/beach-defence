@@ -1,23 +1,29 @@
 import * as THREE from 'three';
 import { groundHeight, waterHeight, WATERLINE_Z, DEFENSE_Z } from './world.js';
 
+const lambert = (color) => new THREE.MeshLambertMaterial({ color });
 const MAT = {
-  uniform: new THREE.MeshLambertMaterial({ color: 0x5a6440 }),
-  trousers: new THREE.MeshLambertMaterial({ color: 0x474f30 }),
-  helmet: new THREE.MeshLambertMaterial({ color: 0x3d4a2c }),
-  skin: new THREE.MeshLambertMaterial({ color: 0xc99a76 }),
-  gear: new THREE.MeshLambertMaterial({ color: 0x6b5a3a }),
-  rifle: new THREE.MeshLambertMaterial({ color: 0x2c2019 }),
+  jacket: lambert(0xff6a13),
+  strip: lambert(0xe8e8e0),
   hit: new THREE.MeshBasicMaterial({ visible: false }),
 };
+// Shared palettes so each person looks different without per-person materials.
+const SHIRTS = [0x2f5d8a, 0x8a2f3a, 0x3f7a4d, 0x6b6b6b, 0xd8d2c0, 0x4a3b6b, 0x20262e].map(lambert);
+const TROUSERS = [0x2b3445, 0x3a3128, 0x4b4f55, 0x1f1f22, 0x5c5240].map(lambert);
+const SKINS = [0xe0b394, 0xc99a76, 0xa0714f, 0x7a5236, 0x5a3a26].map(lambert);
+const HAIR = [0x1c1410, 0x3b2616, 0x6a4526, 0xa8824a, 0x2a2a2a, 0x8c8c8c].map(lambert);
+const ARM_REST = -0.15;
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
 const GEO = {
   torso: new THREE.BoxGeometry(0.46, 0.58, 0.28),
-  pack: new THREE.BoxGeometry(0.36, 0.4, 0.18),
+  jacket: new THREE.BoxGeometry(0.54, 0.46, 0.36),
+  collar: new THREE.BoxGeometry(0.44, 0.16, 0.16),
+  strip: new THREE.BoxGeometry(0.55, 0.04, 0.37),
   head: new THREE.SphereGeometry(0.13, 8, 6),
-  helmet: new THREE.SphereGeometry(0.18, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2),
+  hair: new THREE.SphereGeometry(0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2),
   leg: new THREE.BoxGeometry(0.17, 0.88, 0.2),
   arm: new THREE.BoxGeometry(0.13, 0.56, 0.15),
-  rifle: new THREE.BoxGeometry(0.06, 0.08, 1.0),
   hit: new THREE.BoxGeometry(0.7, 1.8, 0.7),
 };
 
@@ -48,31 +54,35 @@ export class Soldier {
     const body = (this.body = new THREE.Group());
     g.add(body);
 
-    body.add(part(GEO.torso, MAT.uniform, 0, 1.2, 0));
-    body.add(part(GEO.pack, MAT.gear, 0, 1.22, -0.22));
-    body.add(part(GEO.head, MAT.skin, 0, 1.63, 0, false));
-    const helmet = part(GEO.helmet, MAT.helmet, 0, 1.66, 0);
-    helmet.scale.set(1, 0.8, 1.05);
-    body.add(helmet);
+    const shirt = pick(SHIRTS);
+    const skin = pick(SKINS);
+    body.add(part(GEO.torso, shirt, 0, 1.2, 0));
+    // Orange life jacket with a padded collar and reflective strips.
+    body.add(part(GEO.jacket, MAT.jacket, 0, 1.26, 0));
+    body.add(part(GEO.collar, MAT.jacket, 0, 1.5, -0.08));
+    body.add(part(GEO.strip, MAT.strip, 0, 1.18, 0, false));
+    body.add(part(GEO.strip, MAT.strip, 0, 1.32, 0, false));
+    body.add(part(GEO.head, skin, 0, 1.63, 0, false));
+    const hair = part(GEO.hair, pick(HAIR), 0, 1.65, -0.01, false);
+    hair.scale.set(1, 0.75 + Math.random() * 0.4, 1.05);
+    body.add(hair);
 
+    const trousers = pick(TROUSERS);
     this.legs = [-0.12, 0.12].map((x) => {
       const pivot = new THREE.Group();
       pivot.position.set(x, 0.9, 0);
-      pivot.add(part(GEO.leg, MAT.trousers, 0, -0.44, 0));
+      pivot.add(part(GEO.leg, trousers, 0, -0.44, 0));
       body.add(pivot);
       return pivot;
     });
-    this.arms = [-0.3, 0.3].map((x) => {
+    this.arms = [-0.33, 0.33].map((x) => {
       const pivot = new THREE.Group();
       pivot.position.set(x, 1.45, 0);
-      pivot.add(part(GEO.arm, MAT.uniform, 0, -0.27, 0));
-      pivot.rotation.x = -0.7;
+      pivot.add(part(GEO.arm, shirt, 0, -0.27, 0));
+      pivot.rotation.x = ARM_REST;
       body.add(pivot);
       return pivot;
     });
-    const rifle = part(GEO.rifle, MAT.rifle, 0.05, 1.12, 0.3, false);
-    rifle.rotation.set(0.35, -0.35, 0);
-    body.add(rifle);
 
     this.hitbox = new THREE.Mesh(GEO.hit, MAT.hit);
     this.hitbox.position.y = 0.9;
@@ -113,8 +123,9 @@ export class Soldier {
     const s = Math.sin(this.t * speed + this.phase);
     this.legs[0].rotation.x = s * 0.8;
     this.legs[1].rotation.x = -s * 0.8;
-    this.arms[0].rotation.x = -0.7 - s * 0.25;
-    this.arms[1].rotation.x = -0.7 + s * 0.25;
+    // Empty-handed now, so arms swing freely opposite the legs.
+    this.arms[0].rotation.x = ARM_REST - s * 0.7;
+    this.arms[1].rotation.x = ARM_REST + s * 0.7;
     this.body.position.y = Math.abs(Math.cos(this.t * speed + this.phase)) * 0.06;
   }
 
