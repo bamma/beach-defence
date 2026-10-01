@@ -33,6 +33,17 @@ doesn't work, because browsers block module scripts loaded from `file://`.
 | Left click / Space | Fire |
 | Esc | Pause |
 
+On phones and tablets the game switches to touch controls automatically:
+
+| Touch | Action |
+| --- | --- |
+| Drag anywhere | Aim |
+| Hold the **FIRE** button | Fire (you can aim with another finger while firing) |
+| Tap the radio message | Skip it |
+| **II** button | Pause |
+
+Landscape works best. On Android the game goes fullscreen when you start.
+
 ## Rules
 
 - Boats come in waves. Every wave brings more boats that move faster and carry more soldiers.
@@ -50,6 +61,7 @@ doesn't work, because browsers block module scripts loaded from `file://`.
 - `src/waves.js`: wave director and difficulty curve
 - `src/effects.js`: instanced particle effects (splashes, sand, sparks)
 - `src/audio.js`: synthesised WebAudio sound effects
+- `src/input.js`: mouse, keyboard and touch input
 - `src/hud.js`: HUD and menu screens
 
 Add `?debug` to the URL to expose `window.game` for testing.

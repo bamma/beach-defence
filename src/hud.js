@@ -13,6 +13,7 @@ export class Hud {
     this.overlay = $('overlay');
     this.bannerTimer = 0;
     this.lastHeat = -1;
+    this.touch = false;
   }
 
   setScore(v) {
@@ -66,19 +67,27 @@ export class Hud {
     this.overlay.classList.remove('hidden');
   }
 
+  verb() {
+    return this.touch ? 'TAP' : 'CLICK';
+  }
+
   showMenu(best) {
     this.root.classList.add('hidden');
     this.showScreen(`
       <h1>BEACH DEFENCE</h1>
       <p>Enemy landing craft are heading for the beach. Man the machine gun and hold the line.</p>
-      <p class="controls"><b>Mouse</b> aim &nbsp;·&nbsp; <b>Left click / Space</b> fire &nbsp;·&nbsp; <b>Enter</b> skip radio &nbsp;·&nbsp; <b>Esc</b> pause<br/>
+      <p class="controls">${
+        this.touch
+          ? '<b>Drag</b> aim &nbsp;·&nbsp; <b>Hold FIRE</b> shoot &nbsp;·&nbsp; <b>Tap radio</b> skip &nbsp;·&nbsp; <b>II</b> pause'
+          : '<b>Mouse</b> aim &nbsp;·&nbsp; <b>Left click / Space</b> fire &nbsp;·&nbsp; <b>Enter</b> skip radio &nbsp;·&nbsp; <b>Esc</b> pause'
+      }<br/>
       Keep bursts short: an overheated barrel locks up. Sink boats before they land.</p>
       ${best ? `<p class="controls">Best score: ${best.toLocaleString()}</p>` : ''}
-      <div class="cta">CLICK TO MAN THE GUN</div>`);
+      <div class="cta">${this.verb()} TO MAN THE GUN</div>`);
   }
 
   showPause() {
-    this.showScreen(`<h1>PAUSED</h1><div class="cta">CLICK TO RESUME</div>`);
+    this.showScreen(`<h1>PAUSED</h1><div class="cta">${this.verb()} TO RESUME</div>`);
   }
 
   showGameOver(score, wave, kills, best, isBest) {
@@ -88,6 +97,6 @@ export class Hud {
       <p>The enemy broke through the defence line.</p>
       <p class="stats">Score <b>${score.toLocaleString()}</b><br/>Wave ${wave} &nbsp;·&nbsp; ${kills} enemies stopped</p>
       <p class="controls">${isBest ? 'New best score!' : `Best score: ${best.toLocaleString()}`}</p>
-      <div class="cta">CLICK TO PLAY AGAIN</div>`);
+      <div class="cta">${this.verb()} TO PLAY AGAIN</div>`);
   }
 }

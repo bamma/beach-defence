@@ -7,6 +7,10 @@ html, body {
   color: #f1ead8;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
 #app, #app canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
@@ -97,3 +101,56 @@ html, body {
 #overlay .controls { font-size: 14px; opacity: 0.85; }
 #overlay .cta { margin-top: 18px; font-size: 20px; font-weight: bold; color: #fff; animation: blink 1.2s steps(2) infinite; }
 #overlay .stats { font-size: 20px; }
+
+/* --- Touch controls ------------------------------------------------------ */
+.touch-only { display: none; }
+body.touch .touch-only { display: block; }
+
+#fire-btn {
+  position: absolute;
+  right: calc(20px + env(safe-area-inset-right));
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  width: 96px; height: 96px; padding: 0;
+  pointer-events: auto; touch-action: none;
+  border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.75);
+  background: radial-gradient(circle at 40% 35%, rgba(255, 110, 70, 0.75), rgba(170, 30, 15, 0.7));
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55);
+  color: #fff; font: bold 18px "Trebuchet MS", "Segoe UI", system-ui, sans-serif; letter-spacing: 0.12em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+#fire-btn.active { transform: scale(0.93); background: radial-gradient(circle at 40% 35%, rgba(255, 170, 90, 0.9), rgba(220, 50, 20, 0.85)); }
+
+#pause-btn {
+  position: absolute; left: 50%;
+  top: calc(14px + env(safe-area-inset-top));
+  transform: translateX(-50%);
+  width: 44px; height: 44px; padding: 0;
+  pointer-events: auto; touch-action: none;
+  border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.35);
+}
+#pause-btn::before, #pause-btn::after {
+  content: ""; position: absolute; top: 12px; width: 6px; height: 16px; background: #f1ead8; border-radius: 1px;
+}
+#pause-btn::before { left: 13px; }
+#pause-btn::after { right: 13px; }
+
+body.touch #hud-top-left { top: calc(16px + env(safe-area-inset-top)); left: calc(20px + env(safe-area-inset-left)); }
+body.touch #hud-top-right { top: calc(16px + env(safe-area-inset-top)); right: calc(20px + env(safe-area-inset-right)); }
+body.touch #heat-wrap {
+  left: calc(20px + env(safe-area-inset-left)); transform: none; text-align: left;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  width: min(280px, calc(100vw - 160px));
+}
+body.touch #briefing { bottom: calc(130px + env(safe-area-inset-bottom)); }
+body.touch #briefing-bubble { pointer-events: auto; }
+body.touch #score { font-size: 32px; }
+@media (max-width: 520px) {
+  body.touch #lives .pip { width: 10px; height: 16px; }
+}
+@media (max-height: 500px) {
+  body.touch #briefing { bottom: calc(88px + env(safe-area-inset-bottom)); right: 140px; gap: 12px; }
+  body.touch #briefing-portrait { width: 60px; }
+  body.touch #briefing-bubble { font-size: 12px; margin-bottom: 4px; padding: 6px 10px 8px; }
+  body.touch #briefing-bubble .label { font-size: 10px; }
+}

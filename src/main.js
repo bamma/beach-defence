@@ -200,10 +200,21 @@ function gameOver() {
   hud.showGameOver(game.score, game.director.wave, game.kills, Math.max(best, game.score), isBest);
 }
 
+function enterFullscreen() {
+  const el = document.documentElement;
+  if (document.fullscreenElement || !el.requestFullscreen) return;
+  try {
+    el.requestFullscreen({ navigationUI: 'hide' })?.catch?.(() => {});
+  } catch {
+    /* fullscreen unavailable (e.g. iPhone Safari) */
+  }
+}
+
 let overlayReadyAt = 0;
 hud.overlay.addEventListener('click', () => {
   if (performance.now() < overlayReadyAt) return;
   audio.init();
+  if (input.mode === 'touch') enterFullscreen();
   input.requestLock();
   if (game.state === 'menu' || game.state === 'over') startGame();
   else if (game.state === 'paused') resume();
@@ -219,6 +230,24 @@ input.onLockError = () => {
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Enter' && game.state === 'playing') briefing.skip();
 });
+// --- Touch controls -------------------------------------------------------
+hud.touch = input.mode === 'touch';
+input.onTouchMode = () => {
+  hud.touch = true;
+  if (game.state === 'menu') hud.showMenu(loadBest());
+};
+input.bindFireButton(document.getElementById('fire-btn'));
+// Pause on click (not pointerdown) so the same tap can't land on the overlay and resume.
+document.getElementById('pause-btn').addEventListener('click', () => pause());
+document.getElementById('briefing-bubble').addEventListener('pointerdown', (e) => {
+  if (input.mode !== 'touch' || game.state !== 'playing') return;
+  e.preventDefault();
+  briefing.skip();
+});
+document.addEventListener('contextmenu', (e) => {
+  if (input.mode === 'touch') e.preventDefault();
+});
+
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) pause();
 });
