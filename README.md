@@ -38,11 +38,11 @@ On phones and tablets the game switches to touch controls automatically:
 | Touch | Action |
 | --- | --- |
 | Drag anywhere | Aim |
-| Hold the **FIRE** button | Fire (you can aim with another finger while firing) |
+| Hold the **FIRE** button (bottom left) | Fire (you can aim with another finger while firing) |
 | Tap the radio message | Skip it |
 | **II** button | Pause |
 
-Landscape works best. On Android the game goes fullscreen when you start.
+Portrait and landscape both work; portrait widens the view so you still see the whole beach. On Android the game goes fullscreen when you start.
 
 ## Rules
 
