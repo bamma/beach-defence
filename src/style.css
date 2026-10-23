@@ -37,7 +37,7 @@ html, body {
 
 #banner {
   position: absolute; top: 22%; width: 100%; text-align: center;
-  font-size: 48px; font-weight: bold; letter-spacing: 0.15em;
+  font-size: clamp(22px, 7vw, 48px); font-weight: bold; letter-spacing: 0.15em;
   opacity: 0; transition: opacity 0.4s;
 }
 #banner.show { opacity: 1; }
@@ -108,7 +108,7 @@ body.touch .touch-only { display: block; }
 
 #fire-btn {
   position: absolute;
-  right: calc(20px + env(safe-area-inset-right));
+  left: calc(20px + env(safe-area-inset-left));
   bottom: calc(24px + env(safe-area-inset-bottom));
   width: 96px; height: 96px; padding: 0;
   pointer-events: auto; touch-action: none;
@@ -138,7 +138,7 @@ body.touch .touch-only { display: block; }
 body.touch #hud-top-left { top: calc(16px + env(safe-area-inset-top)); left: calc(20px + env(safe-area-inset-left)); }
 body.touch #hud-top-right { top: calc(16px + env(safe-area-inset-top)); right: calc(20px + env(safe-area-inset-right)); }
 body.touch #heat-wrap {
-  left: calc(20px + env(safe-area-inset-left)); transform: none; text-align: left;
+  left: auto; right: calc(20px + env(safe-area-inset-right)); transform: none; text-align: right;
   bottom: calc(24px + env(safe-area-inset-bottom));
   width: min(280px, calc(100vw - 160px));
 }
@@ -149,8 +149,21 @@ body.touch #score { font-size: 32px; }
   body.touch #lives .pip { width: 10px; height: 16px; }
 }
 @media (max-height: 500px) {
-  body.touch #briefing { bottom: calc(88px + env(safe-area-inset-bottom)); right: 140px; gap: 12px; }
+  body.touch #briefing { bottom: calc(88px + env(safe-area-inset-bottom)); left: 140px; gap: 12px; }
   body.touch #briefing-portrait { width: 60px; }
   body.touch #briefing-bubble { font-size: 12px; margin-bottom: 4px; padding: 6px 10px 8px; }
   body.touch #briefing-bubble .label { font-size: 10px; }
+}
+
+/* Portrait phones: tighter top bar and a smaller fire button. */
+@media (orientation: portrait) and (max-width: 520px) {
+  body.touch #hud-top-left { left: calc(12px + env(safe-area-inset-left)); }
+  body.touch #hud-top-right { right: calc(12px + env(safe-area-inset-right)); }
+  body.touch #hud .label { font-size: 10px; }
+  body.touch #score { font-size: 26px; }
+  body.touch #lives .pip { width: 8px; height: 14px; }
+  body.touch #lives { gap: 3px; }
+  body.touch #heat-wrap { width: calc(100vw - 150px); }
+  #fire-btn { width: 88px; height: 88px; }
+  body.touch #briefing { bottom: calc(124px + env(safe-area-inset-bottom)); }
 }

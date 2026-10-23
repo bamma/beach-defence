@@ -24,7 +24,10 @@ renderer.toneMappingExposure = 0.55;
 document.getElementById('app').appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 3000);
+const FOV = 70;
+// Narrowest horizontal view allowed, so portrait screens still see most of the beach.
+const MIN_HFOV = 58;
+const camera = new THREE.PerspectiveCamera(FOV, window.innerWidth / window.innerHeight, 0.05, 3000);
 camera.position.copy(EYE_POS);
 camera.rotation.order = 'YXZ';
 scene.add(camera);
@@ -302,11 +305,18 @@ function frame(now) {
   renderer.render(scene, camera);
 }
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+function fitCamera() {
+  const aspect = window.innerWidth / window.innerHeight;
+  const deg = THREE.MathUtils.DEG2RAD;
+  // Widen the vertical FOV on tall screens so the horizontal view never drops below MIN_HFOV.
+  const vFromH = (2 * Math.atan(Math.tan((MIN_HFOV * deg) / 2) / aspect)) / deg;
+  camera.fov = Math.max(FOV, vFromH);
+  camera.aspect = aspect;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
+}
+fitCamera();
+window.addEventListener('resize', fitCamera);
 
 hud.showMenu(loadBest());
 requestAnimationFrame(frame);
